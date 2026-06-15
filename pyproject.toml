@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ableton-mcp"
+name = "ableton-osc-mcp"
 version = "1.0.0"
 description = "A comprehensive MCP server for controlling Ableton Live via OSC"
 readme = "README.md"
