@@ -218,11 +218,82 @@ DEVICE_PARAMETERS = {
         "Dry/Wet": 2,
         "Grain": 3,
     },
+    "Analog": {
+        "Pitch": 0,
+        "Vibrato": 1,
+        "Filter": 2,
+        "Envelope": 3,
+        "LFO": 4,
+        "Unison": 5,
+    },
+    "Envelope Follower": {
+        "Follower Gain": 0,
+        "Attack": 1,
+        "Release": 2,
+        "Sensitivity": 3,
+        "Dry/Wet": 4,
+    },
+    "Gate": {
+        "Threshold": 0,
+        "Look Ahead": 1,
+        "Attack": 2,
+        "Release": 3,
+        "Floor": 4,
+    },
+    "Arpeggiator": {
+        "Style": 0,
+        "Groove": 1,
+        "Syncopation": 2,
+        "Rate": 3,
+        "Octaves": 4,
+    },
+    "Scale": {
+        "Root": 0,
+        "Mode": 1,
+        "In Scale": 2,
+        "Out Of Scale": 3,
+    },
+    "Chord": {
+        "Root": 0,
+        "Type": 1,
+        "Octave": 2,
+        "Voicing": 3,
+    },
+    "Note Length": {
+        "Length": 0,
+        "Legato": 1,
+        "Sync": 2,
+    },
+    "Random": {
+        "Pitch": 0,
+        "Chance": 1,
+        "Rate": 2,
+        "Amount": 3,
+    },
+    "Velocity": {
+        "Gain": 0,
+        "Curve": 1,
+        "Fixed": 2,
+    },
+    "Simpler": {
+        "Sample": 0,
+        "Pitch": 1,
+        "Pan": 2,
+        "Filter": 3,
+        "Envelope": 4,
+    },
+    "Granulator": {
+        "Grain Size": 0,
+        "Grain Density": 1,
+        "Pitch": 2,
+        "Spray": 3,
+        "Dry/Wet": 4,
+    },
 }
 
 # Device type classification
 DEVICE_TYPES = {
-    # Effects
+    # Audio Effects
     "EQ Eight": "Audio Effect",
     "Compressor": "Audio Effect",
     "Reverb": "Audio Effect",
@@ -240,6 +311,7 @@ DEVICE_TYPES = {
     "Drift": "Audio Effect",
     "Glue Compressor": "Audio Effect",
     "Limiter": "Audio Effect",
+    "Envelope Follower": "Audio Effect",
     # Instruments
     "Operator": "Instrument",
     "Wavetable": "Instrument",
@@ -248,6 +320,17 @@ DEVICE_TYPES = {
     "Corpus": "Instrument",
     "Impulse": "Instrument",
     "Electric": "Instrument",
+    "Analog": "Instrument",
+    "Simpler": "Instrument",
+    "Granulator": "Instrument",
+    # MIDI Effects
+    "Gate": "MIDI Effect",
+    "Arpeggiator": "MIDI Effect",
+    "Scale": "MIDI Effect",
+    "Chord": "MIDI Effect",
+    "Note Length": "MIDI Effect",
+    "Random": "MIDI Effect",
+    "Velocity": "MIDI Effect",
 }
 
 # Common mixing presets for devices
@@ -293,6 +376,21 @@ DEVICE_PRESETS = {
     "Limiter": {
         "Safety": {"Threshold": 0.8},
         "Aggressive": {"Threshold": 0.5, "Attack": 0.05},
+    },
+    "Arpeggiator": {
+        "Up": {"Style": 0.2, "Rate": 0.5},
+        "Down": {"Style": 0.4, "Rate": 0.5},
+        "Up-Down": {"Style": 0.6, "Rate": 0.5},
+        "Random": {"Style": 0.8, "Rate": 0.5},
+    },
+    "Analog": {
+        "Pad": {"Unison": 0.5, "Filter": 0.6},
+        "Lead": {"Unison": 0.8, "Vibrato": 0.6},
+        "Bright": {"Filter": 0.8},
+    },
+    "Gate": {
+        "Tight": {"Attack": 0.05, "Release": 0.2},
+        "Smooth": {"Attack": 0.2, "Release": 0.5},
     },
 }
 
