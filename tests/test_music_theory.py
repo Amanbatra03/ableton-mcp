@@ -1,6 +1,5 @@
 """Unit tests for music theory utilities."""
 
-import pytest
 
 from ableton_mcp.core import music_theory
 
@@ -14,7 +13,7 @@ class TestNoteConversion:
         assert music_theory.note_name_to_midi("A4") == 69
         assert music_theory.note_name_to_midi("C#5") == 73
         assert music_theory.note_name_to_midi("C0") == 12
-        assert music_theory.note_name_to_midi("B7") == 119
+        assert music_theory.note_name_to_midi("B7") == 107
 
     def test_midi_to_note_name(self):
         """Convert MIDI numbers to note names."""
@@ -190,12 +189,12 @@ class TestProgressions:
 def test_music_theory_coverage():
     """Report music theory module coverage."""
     print(
-        f"\nMusic Theory Coverage:"
-        f"\n  Note conversion: note_name_to_midi, midi_to_note_name"
-        f"\n  Chords: 11 types (major, minor, dim, aug, maj7, min7, dom7, maj6, min6, sus2, sus4)"
-        f"\n  Scales: 11 types (major, minor, pentatonic_major, pentatonic_minor, blues, etc.)"
-        f"\n  Drum Patterns: 6 styles (kick, snare, hihat, house, techno, breakbeat)"
-        f"\n  Progressions: 5 templates (pop, sensitive, extended, jazz, minor)"
-        f"\n  Utilities: quantize, transpose, humanize, scale-snap"
-        f"\n  Dependencies: None (pure Python, 100% unit-testable)"
+        "\nMusic Theory Coverage:"
+        "\n  Note conversion: note_name_to_midi, midi_to_note_name"
+        "\n  Chords: 11 types (major, minor, dim, aug, maj7, min7, dom7, maj6, min6, sus2, sus4)"
+        "\n  Scales: 11 types (major, minor, pentatonic_major, pentatonic_minor, blues, etc.)"
+        "\n  Drum Patterns: 6 styles (kick, snare, hihat, house, techno, breakbeat)"
+        "\n  Progressions: 5 templates (pop, sensitive, extended, jazz, minor)"
+        "\n  Utilities: quantize, transpose, humanize, scale-snap"
+        "\n  Dependencies: None (pure Python, 100% unit-testable)"
     )

@@ -4,10 +4,8 @@ These tests verify that the key mixing automation scenarios work end-to-end.
 Tests use mocked OSC responses to avoid requiring a running Ableton instance.
 """
 
-import pytest
 
 from ableton_mcp.core import device_mappings, models
-from ableton_mcp.tools import mixer, batch_operations
 
 
 class TestDeviceMappings:
@@ -196,7 +194,7 @@ def test_device_coverage_statistics():
     instruments = sum(1 for t in device_mappings.DEVICE_TYPES.values() if t == "Instrument")
     total_presets = sum(len(p) for p in device_mappings.DEVICE_PRESETS.values())
 
-    print(f"\nDevice Mapping Coverage:")
+    print("\nDevice Mapping Coverage:")
     print(f"  Total Devices: {total_devices}")
     print(f"    - Effects: {effects}")
     print(f"    - Instruments: {instruments}")

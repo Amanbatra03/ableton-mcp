@@ -41,7 +41,7 @@ def note_name_to_midi(note_name: str) -> int | None:
     if note_part.endswith("#"):
         base_note = note_part[:-1]
         semitone_offset = 1
-    elif note_part.endswith("B"):
+    elif note_part.endswith("B") and len(note_part) > 1:
         base_note = note_part[:-1]
         semitone_offset = -1
     else:

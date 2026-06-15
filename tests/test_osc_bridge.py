@@ -1,5 +1,6 @@
 """Tests for OSC bridge functionality."""
 import pytest
+
 from ableton_mcp.core.errors import NotConnectedError
 from ableton_mcp.osc import OSCBridge
 
