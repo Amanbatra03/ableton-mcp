@@ -3,6 +3,7 @@ import json
 
 from mcp.server.fastmcp import FastMCP
 
+from ableton_mcp.core.device_mappings import get_device_parameter_index, list_device_parameters
 from ableton_mcp.osc import OSCBridge
 from ableton_mcp.osc import addresses as addr
 from ableton_mcp.tools import utils
@@ -23,16 +24,20 @@ def register_tools(mcp: FastMCP) -> None:
         """Set a device parameter by name (intelligent control).
 
         This is the key Phase 2 tool - allows setting parameters by name
-        instead of index. Example: set_device_parameter_by_name(0, "EQ Eight", "High Shelf Gain", 3.0)
+        instead of index using device parameter mappings for common devices.
+
+        Supported devices: EQ Eight, Compressor, Reverb, Delay, Saturator, Vocoder, AutoFilter, Overdrive, Operator, Wavetable, Sampler
+
+        Example: set_device_parameter_by_name(0, "EQ Eight", "High Shelf Gain", 0.7)
 
         Args:
             track_index: The index of the track.
             device_name: The name of the device (e.g., "EQ Eight", "Compressor").
             parameter_name: The name of the parameter (e.g., "Dry/Wet", "Attack").
-            value: The new value for the parameter (typically 0.0 to 1.0).
+            value: The new value for the parameter (0.0 to 1.0).
 
         Returns:
-            Success message with actual parameter values set, or error message.
+            Success message or error message.
         """
         try:
             if not 0.0 <= value <= 1.0:
@@ -40,14 +45,50 @@ def register_tools(mcp: FastMCP) -> None:
 
             bridge = await utils.get_bridge()
 
-            # Step 1: Get device count on this track
+            # Step 1: Look up parameter index in device mappings
+            param_index = get_device_parameter_index(device_name, parameter_name)
+
+            if param_index is None:
+                available_params = list_device_parameters(device_name)
+                if available_params is None:
+                    return json.dumps(
+                        {
+                            "status": "error",
+                            "message": f"Device '{device_name}' not found in parameter mappings",
+                            "available_devices": [
+                                "EQ Eight",
+                                "Compressor",
+                                "Reverb",
+                                "Delay",
+                                "Saturator",
+                                "Vocoder",
+                                "AutoFilter",
+                                "Overdrive",
+                                "Operator",
+                                "Wavetable",
+                                "Sampler",
+                            ],
+                        },
+                        indent=2,
+                    )
+                else:
+                    return json.dumps(
+                        {
+                            "status": "error",
+                            "message": f"Parameter '{parameter_name}' not found on {device_name}",
+                            "available_parameters": available_params,
+                        },
+                        indent=2,
+                    )
+
+            # Step 2: Get device count on this track
             device_count = await bridge.send_and_receive(
                 addr.TRACK_GET_DEVICE_COUNT, [track_index], reply_address=addr.TRACK_GET_DEVICE_COUNT + "/result"
             )
 
             device_count_int = int(device_count)
 
-            # Step 2: Find the device by name
+            # Step 3: Find the device by name on the track
             device_index = None
             for idx in range(device_count_int):
                 try:
@@ -65,45 +106,24 @@ def register_tools(mcp: FastMCP) -> None:
             if device_index is None:
                 return f"Error: Device '{device_name}' not found on track {track_index}"
 
-            # Step 3: Get device parameters and find parameter by name
-            # Note: This is where we'd parse parameter names from get/parameters
-            # For now, we'll need AbletonOSC to expose parameter names properly
-            # As a workaround, we can try common parameter names or return helpful error
+            # Step 4: Set the parameter using the resolved index
+            bridge.send(addr.DEVICE_SET_PARAMETER_VALUE, [track_index, device_index, param_index, value])
 
-            # Known limitation: AbletonOSC /live/device/get/parameters returns formatted string
-            # We need to parse this to find parameter names and indices
-            try:
-                params_data = await bridge.send_and_receive(
-                    addr.DEVICE_GET_PARAMETERS,
-                    [track_index, device_index],
-                    reply_address=addr.DEVICE_GET_PARAMETERS + "/result",
-                )
-                # Raw parameter data - format depends on AbletonOSC version
-                # This would require parsing the format to find parameter index by name
-                return json.dumps(
-                    {
-                        "status": "partial",
-                        "message": f"Found device '{device_name}' at index {device_index} on track {track_index}",
-                        "warning": "Parameter name resolution requires AbletonOSC parameter enumeration format",
-                        "next_step": f"Use set_device_parameter(track={track_index}, device={device_index}, param=<index>, value={value})",
-                        "raw_params": str(params_data),
-                    },
-                    indent=2,
-                )
-            except Exception as e:
-                return json.dumps(
-                    {
-                        "status": "partial",
-                        "message": f"Found device '{device_name}' at index {device_index} on track {track_index}",
-                        "warning": "Could not enumerate parameters for name resolution",
-                        "error": str(e),
-                        "suggestion": "AbletonOSC may need update to expose parameter names",
-                    },
-                    indent=2,
-                )
+            return json.dumps(
+                {
+                    "status": "success",
+                    "message": f"Set {device_name} parameter '{parameter_name}' to {value}",
+                    "track_index": track_index,
+                    "device_index": device_index,
+                    "parameter_index": param_index,
+                    "parameter_name": parameter_name,
+                    "value": value,
+                },
+                indent=2,
+            )
 
         except Exception as e:
-            return f"Error: {e}"
+            return json.dumps({"status": "error", "message": str(e)}, indent=2)
 
     @mcp.tool()
     async def add_device_to_track(track_index: int, device_name: str) -> str:
