@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ableton-mcp"
+version = "0.1.0"
+description = "A comprehensive MCP server for controlling Ableton Live via OSC"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Aman Batra", email = "amanbatra619@gmail.com" }]
+keywords = ["ableton", "mcp", "osc", "music", "daw"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+requires-python = ">=3.11"
+
+dependencies = [
+    "mcp>=1.0.0",
+    "python-osc>=1.8.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Amanbatra03/ableton-mcp"
+Repository = "https://github.com/Amanbatra03/ableton-mcp.git"
+Issues = "https://github.com/Amanbatra03/ableton-mcp/issues"
+
+[project.scripts]
+ableton-mcp = "ableton_mcp.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ableton_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "live: requires a running Ableton Live instance with AbletonOSC",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]  # line-length handled by format
+
+[tool.pyright]
+include = ["src"]
+exclude = ["**/node_modules", "**/__pycache__"]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
