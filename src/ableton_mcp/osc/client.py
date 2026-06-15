@@ -42,6 +42,9 @@ class OSCBridge:
 
     async def start(self) -> None:
         """Start the OSC receive server."""
+        if self._connected:
+            logger.debug("OSC bridge already started")
+            return
         await self._dispatcher.start()
         self._connected = True
         logger.info(f"OSC bridge started: send to {self.host}:{self.send_port}, recv on port {self.recv_port}")

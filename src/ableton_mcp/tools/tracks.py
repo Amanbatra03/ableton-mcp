@@ -4,21 +4,12 @@ from mcp.server.fastmcp import FastMCP
 from ableton_mcp.core.errors import NotConnectedError
 from ableton_mcp.osc import OSCBridge
 from ableton_mcp.osc import addresses as addr
-
-_bridge: OSCBridge | None = None
+from ableton_mcp.tools import utils
 
 
 def set_bridge(bridge: OSCBridge) -> None:
     """Set the OSC bridge instance for this module."""
-    global _bridge
-    _bridge = bridge
-
-
-async def _ensure_bridge() -> OSCBridge:
-    """Ensure bridge is available."""
-    if _bridge is None:
-        raise NotConnectedError("OSC bridge not initialized")
-    return _bridge
+    utils.set_bridge(bridge)
 
 
 def register_tools(mcp: FastMCP) -> None:
@@ -33,7 +24,7 @@ def register_tools(mcp: FastMCP) -> None:
             at_index: Index to insert at (-1 appends to end).
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.SONG_CREATE_MIDI_TRACK, at_index)
 
             if name != "New MIDI Track":
@@ -52,7 +43,7 @@ def register_tools(mcp: FastMCP) -> None:
             at_index: Index to insert at (-1 appends to end).
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.SONG_CREATE_AUDIO_TRACK, at_index)
 
             if name != "New Audio Track":
@@ -73,7 +64,7 @@ def register_tools(mcp: FastMCP) -> None:
         try:
             if not 0.0 <= volume <= 1.0:
                 return f"Error: Volume must be between 0.0 and 1.0, got {volume}"
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.TRACK_SET_VOLUME, [track_index, volume])
             return f"Track {track_index} volume set to {volume}"
         except NotConnectedError as e:
@@ -87,7 +78,7 @@ def register_tools(mcp: FastMCP) -> None:
             track_index: The index of the track (starting at 0).
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             volume = await bridge.send_and_receive(
                 addr.TRACK_GET_VOLUME, [track_index], reply_address=addr.TRACK_GET_VOLUME + "/result"
             )
@@ -104,7 +95,7 @@ def register_tools(mcp: FastMCP) -> None:
             mute: True to mute, False to unmute.
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.TRACK_SET_MUTE, [track_index, 1 if mute else 0])
             return f"Track {track_index} {'muted' if mute else 'unmuted'}"
         except NotConnectedError as e:
@@ -119,7 +110,7 @@ def register_tools(mcp: FastMCP) -> None:
             solo: True to solo, False to unsolo.
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.TRACK_SET_SOLO, [track_index, 1 if solo else 0])
             return f"Track {track_index} {'soloed' if solo else 'unsoloed'}"
         except NotConnectedError as e:
@@ -134,7 +125,7 @@ def register_tools(mcp: FastMCP) -> None:
             name: The new name for the track.
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.TRACK_SET_NAME, [track_index, name])
             return f"Track {track_index} renamed to '{name}'"
         except NotConnectedError as e:
@@ -151,7 +142,7 @@ def register_tools(mcp: FastMCP) -> None:
         try:
             if not -1.0 <= pan <= 1.0:
                 return f"Error: Pan must be between -1.0 and 1.0, got {pan}"
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.TRACK_SET_PANNING, [track_index, pan])
             return f"Track {track_index} pan set to {pan}"
         except NotConnectedError as e:
@@ -166,7 +157,7 @@ def register_tools(mcp: FastMCP) -> None:
             armed: True to arm, False to disarm.
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.TRACK_SET_ARM, [track_index, 1 if armed else 0])
             return f"Track {track_index} {'armed' if armed else 'disarmed'}"
         except NotConnectedError as e:

@@ -17,7 +17,10 @@ else:
 
 def create_app() -> FastMCP:
     """Create and configure the MCP server application."""
-    mcp = FastMCP("Ableton", instructions="Control Ableton Live via OSC")
+    mcp = FastMCP(
+        "Ableton",
+        instructions="Control Ableton Live via OSC. The OSC bridge will start automatically on first use.",
+    )
 
     bridge = OSCBridge(
         host=settings.ableton_ip,
@@ -36,25 +39,7 @@ def create_app() -> FastMCP:
     clips.register_tools(mcp)
     devices.register_tools(mcp)
 
-    async def startup() -> None:
-        """Called when the server starts."""
-        try:
-            await bridge.start()
-            logger.info("Ableton MCP server started")
-        except Exception as e:
-            logger.error(f"Failed to start OSC bridge: {e}")
-            raise
-
-    async def shutdown() -> None:
-        """Called when the server shuts down."""
-        try:
-            await bridge.stop()
-            logger.info("Ableton MCP server stopped")
-        except Exception as e:
-            logger.error(f"Error during shutdown: {e}")
-
-    mcp._on_startup = startup
-    mcp._on_shutdown = shutdown
+    logger.info("Ableton MCP server initialized")
 
     return mcp
 

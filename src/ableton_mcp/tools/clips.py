@@ -4,21 +4,12 @@ from mcp.server.fastmcp import FastMCP
 from ableton_mcp.core.errors import NotConnectedError
 from ableton_mcp.osc import OSCBridge
 from ableton_mcp.osc import addresses as addr
-
-_bridge: OSCBridge | None = None
+from ableton_mcp.tools import utils
 
 
 def set_bridge(bridge: OSCBridge) -> None:
     """Set the OSC bridge instance for this module."""
-    global _bridge
-    _bridge = bridge
-
-
-async def _ensure_bridge() -> OSCBridge:
-    """Ensure bridge is available."""
-    if _bridge is None:
-        raise NotConnectedError("OSC bridge not initialized")
-    return _bridge
+    utils.set_bridge(bridge)
 
 
 def register_tools(mcp: FastMCP) -> None:
@@ -36,7 +27,7 @@ def register_tools(mcp: FastMCP) -> None:
         try:
             if length_beats <= 0:
                 return f"Error: Clip length must be positive, got {length_beats}"
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.CLIP_SLOT_CREATE_CLIP, [track_index, clip_index, length_beats])
             return f"Created {length_beats}-beat MIDI clip at track {track_index}, slot {clip_index}"
         except NotConnectedError as e:
@@ -51,7 +42,7 @@ def register_tools(mcp: FastMCP) -> None:
             clip_index: The index of the clip slot (starting at 0).
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.CLIP_SLOT_FIRE, [track_index, clip_index])
             return f"Fired clip at track {track_index}, slot {clip_index}"
         except NotConnectedError as e:
@@ -66,7 +57,7 @@ def register_tools(mcp: FastMCP) -> None:
             clip_index: The index of the clip slot (starting at 0).
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.CLIP_SLOT_STOP, [track_index, clip_index])
             return f"Stopped clip at track {track_index}, slot {clip_index}"
         except NotConnectedError as e:
@@ -101,7 +92,7 @@ def register_tools(mcp: FastMCP) -> None:
             if duration <= 0:
                 return f"Error: Duration must be positive, got {duration}"
 
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.CLIP_ADD_NOTES, [track_index, clip_index, pitch, start_time, duration, velocity, 0])
             return f"Added note {pitch} to clip at track {track_index}, slot {clip_index}"
         except NotConnectedError as e:
@@ -117,7 +108,7 @@ def register_tools(mcp: FastMCP) -> None:
             name: The new name for the clip.
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.CLIP_SET_NAME, [track_index, clip_index, name])
             return f"Clip at track {track_index}, slot {clip_index} renamed to '{name}'"
         except NotConnectedError as e:
@@ -127,7 +118,7 @@ def register_tools(mcp: FastMCP) -> None:
     async def stop_all_clips() -> str:
         """Stop all currently playing clips in the session."""
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.SONG_STOP_ALL_CLIPS)
             return "All clips stopped"
         except NotConnectedError as e:

@@ -4,21 +4,12 @@ from mcp.server.fastmcp import FastMCP
 from ableton_mcp.core.errors import NotConnectedError
 from ableton_mcp.osc import OSCBridge
 from ableton_mcp.osc import addresses as addr
-
-_bridge: OSCBridge | None = None
+from ableton_mcp.tools import utils
 
 
 def set_bridge(bridge: OSCBridge) -> None:
     """Set the OSC bridge instance for this module."""
-    global _bridge
-    _bridge = bridge
-
-
-async def _ensure_bridge() -> OSCBridge:
-    """Ensure bridge is available."""
-    if _bridge is None:
-        raise NotConnectedError("OSC bridge not initialized")
-    return _bridge
+    utils.set_bridge(bridge)
 
 
 def register_tools(mcp: FastMCP) -> None:
@@ -37,7 +28,7 @@ def register_tools(mcp: FastMCP) -> None:
         try:
             if not 0.0 <= value <= 1.0:
                 return f"Error: Parameter value must be between 0.0 and 1.0, got {value}"
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             bridge.send(addr.DEVICE_SET_PARAMETER_VALUE, [track_index, device_index, parameter_index, value])
             return f"Set device {device_index} parameter {parameter_index} to {value} on track {track_index}"
         except NotConnectedError as e:
@@ -53,7 +44,7 @@ def register_tools(mcp: FastMCP) -> None:
             parameter_index: The index of the parameter.
         """
         try:
-            bridge = await _ensure_bridge()
+            bridge = await utils.get_bridge()
             value = await bridge.send_and_receive(
                 addr.DEVICE_GET_PARAMETER_VALUE,
                 [track_index, device_index, parameter_index],
