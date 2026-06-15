@@ -5,7 +5,7 @@ from mcp.server.fastmcp import FastMCP
 
 from ableton_mcp.config import settings
 from ableton_mcp.osc import OSCBridge
-from ableton_mcp.tools import clips, devices, mixer, tracks, transport
+from ableton_mcp.tools import clips, device_control, devices, mixer, tracks, transport
 
 logger = logging.getLogger(__name__)
 
@@ -34,12 +34,14 @@ def create_app() -> FastMCP:
     clips.set_bridge(bridge)
     devices.set_bridge(bridge)
     mixer.set_bridge(bridge)
+    device_control.set_bridge(bridge)
 
     transport.register_tools(mcp)
     tracks.register_tools(mcp)
     clips.register_tools(mcp)
     devices.register_tools(mcp)
     mixer.register_tools(mcp)
+    device_control.register_tools(mcp)
 
     logger.info("Ableton MCP server initialized")
 
